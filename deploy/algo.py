@@ -3,7 +3,7 @@ import tensorflow as tf
 import tensorflow_io as tfio
 import tensorflow_hub as hub
 
-client = Algorithmia.client("simW9k5wBqG+LyHZ3P2cTpewCkb1")
+client = Algorithmia.client()
 
 
 # Configure Tensorflow to only use up to 30% of the GPU.

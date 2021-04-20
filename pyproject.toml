@@ -21,6 +21,7 @@ leaf_audio = { path = "../leaf-audio/", develop = true }
 kapre = "^0.3.5"
 tensorflow-hub = "^0.11.0"
 algorithmia = "^1.8.1"
+streamlit = "^0.80.0"
 
 [tool.poetry.dev-dependencies]
 
