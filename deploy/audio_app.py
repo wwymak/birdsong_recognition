@@ -1,11 +1,10 @@
 import streamlit as st
 import tensorflow as tf
-import tensorflow_hub as hub
-import tensorflow_io as tfio
-import Algorithmia
 
-client = Algorithmia.client(st.secrets["algorithmia_access"])
-algo = client.algo('shadyvale/birdsong_classifier/0.1.1')
+# import Algorithmia
+#
+# client = Algorithmia.client(st.secrets["algorithmia_access"])
+# algo = client.algo('shadyvale/birdsong_classifier/0.1.1')
 
 from algo import apply
 
