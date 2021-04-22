@@ -60,7 +60,6 @@ jupyterlab-widgets==1.0.0; python_version >= "3.6"
 kapre==0.3.5
 keras-preprocessing==1.1.2; python_version >= "3.5" and python_version < "3.9"
 kiwisolver==1.3.1; python_version >= "3.7"
-leaf-audio @ /home/wwymak/full_stack_dl_2021/project/leaf-audio
 librosa==0.8.0; python_version >= "3.6"
 lingvo==0.8.2; python_version >= "3.6" and python_version < "3.9"
 llvmlite==0.36.0; python_version >= "3.6" and python_version < "3.10"
