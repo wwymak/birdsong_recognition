@@ -2,8 +2,9 @@ import Algorithmia
 import tensorflow as tf
 import tensorflow_io as tfio
 import tensorflow_hub as hub
+import streamlit as st
 
-client = Algorithmia.client()
+client = Algorithmia.client(st.secrets["algorithmia_access"])
 
 
 # Configure Tensorflow to only use up to 30% of the GPU.
@@ -58,8 +59,8 @@ def load_model():
     """Load model from data collection."""
     file_uri = "data://shadyvale/birdsong_classifier_models/model_all_birds_v1.h5"
     # Retrieve file name from data collections.
-    # saved_model_path = client.file(file_uri).getFile().name
-    saved_model_path = "model_all_birds_v1.h5"
+    saved_model_path = client.file(file_uri).getFile().name
+    # saved_model_path = "model_all_birds_v1.h5"
     model = tf.keras.models.load_model(saved_model_path, custom_objects={'ReduceMeanLayer': ReduceMeanLayer,
                                                                                   'KerasLayer': hub.KerasLayer})
 
