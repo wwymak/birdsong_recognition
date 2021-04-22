@@ -7,10 +7,10 @@ client = Algorithmia.client()
 
 
 # Configure Tensorflow to only use up to 30% of the GPU.
-gpus = tf.config.experimental.list_physical_devices('GPU')
-tf.config.experimental.set_memory_growth(gpus[0], True)
-tf.config.experimental.set_virtual_device_configuration(gpus[0], [
-    tf.config.experimental.VirtualDeviceConfiguration(memory_limit=3432)])
+# gpus = tf.config.experimental.list_physical_devices('GPU')
+# tf.config.experimental.set_memory_growth(gpus[0], True)
+# tf.config.experimental.set_virtual_device_configuration(gpus[0], [
+#     tf.config.experimental.VirtualDeviceConfiguration(memory_limit=3432)])
 
 bird_mapping_idx_to_name = {0: 'barn_swallow', 1: 'black-headed_gull', 2: 'black_woodpecker', 3: 'carrion_crow',
                             4: 'coal_tit',
@@ -58,7 +58,8 @@ def load_model():
     """Load model from data collection."""
     file_uri = "data://shadyvale/birdsong_classifier_models/model_all_birds_v1.h5"
     # Retrieve file name from data collections.
-    saved_model_path = client.file(file_uri).getFile().name
+    # saved_model_path = client.file(file_uri).getFile().name
+    saved_model_path = "model_all_birds_v1.h5"
     model = tf.keras.models.load_model(saved_model_path, custom_objects={'ReduceMeanLayer': ReduceMeanLayer,
                                                                                   'KerasLayer': hub.KerasLayer})
 
@@ -93,7 +94,7 @@ def predict(input):
 def apply(input):
     """Pass in a csv image file and output prediction."""
     output = predict(input)
-    print(output)
+    # print(output)
     return output
 
 

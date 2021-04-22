@@ -334,7 +334,6 @@ kiwisolver==1.3.1; python_version >= "3.7" \
     --hash=sha256:33449715e0101e4d34f64990352bce4095c8bf13bed1b390773fc0a7295967b3 \
     --hash=sha256:401a2e9afa8588589775fe34fc22d918ae839aaaf0c0e96441c0fdbce6d8ebe6 \
     --hash=sha256:950a199911a8d94683a6b10321f9345d5a3a8433ec58b217ace979e18f16e248
-leaf-audio @ /home/wwymak/full_stack_dl_2021/project/leaf-audio
 librosa==0.8.0; python_version >= "3.6" \
     --hash=sha256:af0b9f2ed4bbf6aecbc448a4cd27c16453c397cb6bef0f0cfba0e63afea2b839
 lingvo==0.8.2; python_version >= "3.6" and python_version < "3.9" \
