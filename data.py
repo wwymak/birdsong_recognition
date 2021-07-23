@@ -6,8 +6,9 @@ from sklearn.preprocessing import LabelEncoder
 import numpy as np
 import tensorflow as tf
 import tensorflow_io as tfio
+import os
 
-SAMPLING_RATE = 32_000
+SAMPLING_RATE = 16_000
 
 bird_mapping_idx_to_name = {0: 'barn_swallow', 1: 'black-headed_gull', 2: 'black_woodpecker', 3: 'carrion_crow', 4: 'coal_tit',
                 5: 'common_blackbird', 6: 'common_chaffinch', 7: 'common_chiffchaff', 8: 'common_cuckoo',
@@ -78,7 +79,7 @@ def fetch_metadata():
     )
     birdsong_metadata = birdsong_metadata[birdsong_metadata.label_string.isin((birdsong_metadata.label_string.value_counts() > 100).index)]
 
-    birdsong_metadata["label"] = birdsong_metadata.label_string.apply(lambda x:bird_mapping_name_to_idx.get(x))
+    birdsong_metadata["label"] = birdsong_metadata.label_string.apply(lambda x:bird_mapping_name_to_idx.get(x)).astype(int)
 
     birdsong_metadata["filepath"] = birdsong_metadata[["id", "label_string"]].apply(
         lambda row: f"{dataset_folder}/{row.label_string}/{row['id']}.wav", axis=1
@@ -87,6 +88,59 @@ def fetch_metadata():
     birdsong_metadata = birdsong_metadata[birdsong_metadata.valid == True]
 
     return birdsong_metadata
+
+def fetch_metadata_v2():
+    dataset_folder = Path('/media/wwymak/Storage2/birdsong_dataset/xeno_canto_eu_cleaned_stage2')
+
+    birdsong_metadata = pd.read_csv('xeno_canto_uk/xeno-canto_ukbirds_worldwide_songs_ratingAB.csv')
+    birdsong_metadata["label_string"] = birdsong_metadata.en.apply(
+        lambda x: x.lower().replace(" ", "_")
+    )
+
+    birdsong_metadata = birdsong_metadata[birdsong_metadata["label_string"].isin(os.listdir(dataset_folder))]
+    birdsong_metadata["filepath"] = birdsong_metadata.apply(lambda row: str(dataset_folder / row.label_string / f"{row['id']}.wav"), axis=1)
+    birdsong_metadata['is_valid'] = birdsong_metadata["filepath"].apply(lambda x: Path(x).exists())
+    label_counts = birdsong_metadata.label_string.value_counts()
+    valid_labels = label_counts[label_counts > 10].index
+    birdsong_metadata = birdsong_metadata[birdsong_metadata.label_string.isin(valid_labels)]
+    birdsong_metadata = birdsong_metadata[birdsong_metadata['is_valid']]
+
+    le = LabelEncoder()
+    birdsong_metadata['label'] = le.fit_transform(birdsong_metadata['label_string'])
+
+    bird_mapping_idx_to_name = {k: v for k, v in zip(np.arange(len(le.classes_)), le.classes_)}
+    return birdsong_metadata, bird_mapping_idx_to_name
+
+def db_to_linear(samples):
+    return 10.0 ** (samples / 20.0)
+
+
+def loudness_normalization(samples: tf.Tensor,
+                           target_db: float = 15.0,
+                           max_gain_db: float = 30.0):
+    """Normalizes the loudness of the input signal."""
+    std = tf.math.reduce_std(samples) + 1e-9
+    gain = tf.minimum(db_to_linear(max_gain_db), db_to_linear(target_db) / std)
+    return gain * samples
+
+def align(waveform: tf.Tensor, seq_len: int=16000 * 30):
+    """make sure all training samples are the same length of time
+    for shorter samples, repeat the same waveform again, then random crop
+    """
+    waveform_len = tf.size(waveform)
+    pad_length = tf.maximum(seq_len - tf.size(waveform), 0)
+    print(pad_length)
+    pad_repeats = tf.cast(tf.math.ceil(pad_length / waveform_len), tf.int32)
+    print(pad_repeats)
+    samples = tf.squeeze(tf.tile(waveform, [pad_repeats + 1]))
+
+    samples = tf.image.random_crop(tf.reshape(samples, (-1, 1)), [seq_len, 1])
+    return tf.squeeze(samples)
+
+def denoise(samples: tf.Tensor, threshold: float=0.1):
+    mask = tf.greater(tf.abs(samples), threshold)
+    samples = tf.where(mask, samples, tf.zeros_like(samples))
+    return samples
 
 
 @tf.function
@@ -102,7 +156,10 @@ def load_wav_16k_mono(filename):
     return wav
 
 
-def load_wav_for_map(filename, label, fold):
-    return load_wav_16k_mono(filename), label, fold
+def load_wav_for_map(filename, label, fold, transforms=None):
+    wav = load_wav_16k_mono(filename)
+    for fn in transforms:
+        wav = fn(wav)
+    return wav, label, fold
 
 

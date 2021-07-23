@@ -13,7 +13,7 @@ if __name__ == '__main__':
     uk_birds = pd.read_csv('uk_common_birds_all.csv')
 
     def get_jobs(genus, species):
-        xeno_canto_metadata_url = f"https://www.xeno-canto.org/api/2/recordings?query={genus}+{species}+type:song+q_gt:C"
+        xeno_canto_metadata_url = f"https://www.xeno-canto.org/api/2/recordings?query={genus}+{species}+q_gt:C"
         first_page = session.get(xeno_canto_metadata_url).json()
         yield first_page
         num_pages = first_page['numPages']
@@ -29,7 +29,7 @@ if __name__ == '__main__':
         for page in get_jobs(row.genus, row.species):
             metadata.append(pd.DataFrame(page['recordings']))
 
-    pd.concat(metadata).to_csv('xeno-canto_ukbirds_worldwide_songs_ratingAB.csv', index=False)
+    pd.concat(metadata).to_csv('xeno-canto_ukbirds_worldwide_ratingAB.csv', index=False)
 
     # def get_jobs():
     #     # xeno_canto_metadata_url = "https://www.xeno-canto.org/api/2/recordings?query=box:49.951,-15.469,60.24,3.516+type:song+q_gt:C"

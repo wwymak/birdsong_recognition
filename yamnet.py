@@ -1,17 +1,6 @@
 import tensorflow as tf
 import tensorflow_hub as hub
-import numpy as np
 import csv
-import pandas as pd
-import matplotlib.pyplot as plt
-from IPython.display import Audio
-from scipy.io import wavfile
-import tensorflow_io as tfio
-import soundfile as sf
-
-from sklearn.model_selection import train_test_split
-
-from data import fetch_metadata,path_to_audio, paths_and_labels_to_dataset
 
 
 class Yamnet:

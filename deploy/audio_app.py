@@ -19,5 +19,10 @@ if uploaded_file is not None:
         bytes_data,
         desired_channels=1)
     st.write(f"sample rate of audio: {sample_rate}")
+    st.audio(wav)
+
     response = apply(bytes_data)
     st.write(response)
+
+    st.write("is the prediction incorrect? Please let us know below by entering the name of the bird below:")
+    st.text_area()
